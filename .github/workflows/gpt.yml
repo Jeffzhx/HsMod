@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET Framework
+      - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3
 
       - name: Restore NuGet packages
@@ -29,4 +29,4 @@ jobs:
         with:
           name: HsMod-build
           path: |
-            **/bin/Release/*.dll
+            HsMod/bin/Release/*.dll
