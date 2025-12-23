@@ -1,42 +1,28 @@
-name: Build and Release HsMod.dll
+name: Build and Release HsMod
 
 on:
   push:
     branches: [ bepinex5 ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
-
-      - name: Restore dependencies
-        run: dotnet restore --locked-mode
-
-      - name: Build HsMod.dll
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Upload DLL to Release
+      - uses: actions/checkout@v4
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+      - name: Restore Packages
+        run: nuget restore HsMod.sln
+      - name: Build Solution
+        run: msbuild HsMod.sln /p:Configuration=Release /p:Platform="Any CPU"
+      - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: auto-build-${{ github.run_number }}
-          name: Auto Build ${{ github.sha }}
-          body: |
-            自动编译的最新 HsMod.dll（.NET 8 版）
-            来自 commit: ${{ github.sha }}
+          tag_name: latest-build
+          name: Latest Build
+          body: Automated build of HsMod.dll from commit ${{ github.sha }}
+          prerelease: true
           files: HsMod/Release/HsMod.dll
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
