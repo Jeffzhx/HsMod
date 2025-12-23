@@ -1,4 +1,4 @@
-name: Build and Release HsMod
+name: Release HsMod
 
 on:
   push:
