@@ -19,10 +19,10 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.x'
 
       - name: Restore dependencies
-        run: dotnet restore --locked-mode  # 官方推荐，固定版本依赖
+        run: dotnet restore --locked-mode
 
       - name: Build HsMod.dll
         run: dotnet build --configuration Release --no-restore
@@ -31,11 +31,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-build-${{ github.run_number }}
-          name: Auto Build ${{ github.sha }}
+          name: Auto Build ${{ github.sha::8 }}
           body: |
-            自动编译的最新 HsMod.dll（.NET 8 版）
+            自动编译的最新 HsMod.dll（.NET 8 版，支持 BepInEx 5）
             来自 commit: ${{ github.sha }}
-          files: HsMod/Release/HsMod.dll  # 官方输出路径
+          files: HsMod/Release/HsMod.dll
           draft: false
           prerelease: false
         env:
