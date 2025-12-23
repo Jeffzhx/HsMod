@@ -3,8 +3,6 @@ name: Build HsMod
 on:
   push:
     branches: [ "bepinex5" ]
-  pull_request:
-    branches: [ "bepinex5" ]
   workflow_dispatch:
 
 jobs:
@@ -12,21 +10,30 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3
+      - uses: microsoft/setup-msbuild@v1.3
 
-      - name: Restore NuGet packages
+      - name: Restore NuGet
         run: nuget restore HsMod.sln
 
-      - name: Build HsMod
+      - name: Build
         run: msbuild HsMod.sln /p:Configuration=Release
+
+      - name: List files after build
+        run: |
+          echo "===== ROOT ====="
+          dir
+          echo "===== HsMod ====="
+          dir HsMod
+          echo "===== BIN ====="
+          dir HsMod\bin
+          echo "===== RELEASE ====="
+          dir HsMod\bin\Release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: HsMod-build
           path: |
-            HsMod/bin/Release/*.dll
+            **/*.dll
