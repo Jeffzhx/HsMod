@@ -1,33 +1,30 @@
-name: Build HsMod
+name: Build and Release HsMod
 
 on:
   push:
-    branches: [ "bepinex5" ]
-  workflow_dispatch:
+    branches: [ bepinex5 ]
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   build:
-    runs-on: windows-latest   # ✅ 必须是 Windows
-
+    runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3
-
-      - name: Restore NuGet
-        run: nuget restore HsMod.sln
-
-      - name: Build with MSBuild
-        run: |
-          msbuild HsMod.sln ^
-            /p:Configuration=Release ^
-            /p:Platform="Any CPU"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: HsMod-build
-          path: |
-            **/HsMod.dll
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Restore dependencies
+        run: dotnet restore --locked-mode
+      - name: Build HsMod
+        run: dotnet build --configuration Release --no-restore
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-build
+          name: Latest Build
+          body: Automated build of HsMod.dll from commit ${{ github.sha }}
+          prerelease: true
+          files: HsMod/Release/HsMod.dll
