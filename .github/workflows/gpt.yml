@@ -7,33 +7,27 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest   # ✅ 必须是 Windows
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: microsoft/setup-msbuild@v1.3
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3
 
       - name: Restore NuGet
         run: nuget restore HsMod.sln
 
-      - name: Build
-        run: msbuild HsMod.sln /p:Configuration=Release
-
-      - name: List files after build
+      - name: Build with MSBuild
         run: |
-          echo "===== ROOT ====="
-          dir
-          echo "===== HsMod ====="
-          dir HsMod
-          echo "===== BIN ====="
-          dir HsMod\bin
-          echo "===== RELEASE ====="
-          dir HsMod\bin\Release
+          msbuild HsMod.sln ^
+            /p:Configuration=Release ^
+            /p:Platform="Any CPU"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: HsMod-build
           path: |
-            **/*.dll
+            **/HsMod.dll
