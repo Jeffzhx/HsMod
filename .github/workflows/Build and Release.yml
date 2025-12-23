@@ -31,7 +31,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-build-${{ github.run_number }}
-          name: Auto Build ${{ github.sha::8 }}
+          name: Auto Build ${{ github.sha }}
           body: |
             自动编译的最新 HsMod.dll（.NET 8 版，支持 BepInEx 5）
             来自 commit: ${{ github.sha }}
